@@ -1,15 +1,20 @@
-const cardJson = require('./card.json');
+//const cardJson = require('./card.json');
 const fs = require('fs');
 const path = require('path');
+const xlsx = require('xlsx');
 
 const getInformations = () => {
-    const taskAltArray = cardJson.checklists.find(object => object.name === 'Texte alt ').checkItems;
+    //const taskAltArray = cardJson.checklists.find(object => object.name === 'Texte alt').checkItems;
+    const excelFile = xlsx.readFile('Text.Alt manquants.xlsx');
+    const worksheet = excelFile.Sheets['Acanthe Paysage'];
+    const taskAltArray = xlsx.utils.sheet_to_json(worksheet);
+
     const imageArray = [];
     const regex = /img.*?\.[a-zA-Z0-9]+/g;
 
-    taskAltArray.forEach(task => {
-        const urlImg = task.name.match(regex);
-        const altImg = task.name.split(':')[2].trim();
+    taskAltArray.forEach(cell => {
+        const urlImg = cell.Liens.match(regex);
+        const altImg = cell.Alt.trim();
 
         imageArray.push({
             'link': urlImg[0],
@@ -50,7 +55,7 @@ const updateAlt = (filePath, objects) => {
     }
 }
 
-const directory = 'C:/wamp64/www/www.taxi-78.com/htdocs/';
+const directory = 'C:/wamp64/www/www.paysagisteparis.fr/htdocs/pages';
 const objectInfos = getInformations();
 
 fs.readdir(directory, (err, files) => {
